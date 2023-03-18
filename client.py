@@ -1,9 +1,27 @@
 
+import sys
+import datetime
+
 import time
 import socket
 import datetime
 from dateutil import parser
 from timeit import default_timer as timer
+
+def linux_set_time(datetime):
+  try: 
+    import subprocess
+    import shlex
+
+    time = (datetime.year, datetime.month, datetime.day, datetime.hour, datetime.minute, datetime.second, datetime.microsecond)
+
+    time_string = datetime(*time).isoformat()
+
+    subprocess.call(shlex.split("timedatectl set-ntp false")) 
+    subprocess.call(shlex.split("sudo date -s '%s'" % time_string))
+    subprocess.call(shlex.split("sudo hwclock -w"))
+  except:
+    print("Erro ao sincronizar o horário do sistema")
  
 # Algoritmo de Cristian - Cliente
 def client():
@@ -35,6 +53,10 @@ def client():
   # hora do cliente é a hora do servidor + o delay 
   hora_cliente = hora_ntp + datetime.timedelta(seconds = delay)
 
+  # Atualiza horário do sistema operacional
+  if sys.platform == 'linux2' or sys.platform == 'linux':
+    linux_set_time(hora_cliente)
+
   print("Horário: " + str(hora_cliente))
 
   # calcula a diferença na sincronização
@@ -59,6 +81,6 @@ if __name__ == '__main__':
     total_diferenca += diferenca.total_seconds()
     print("Média de latência: " + str(total_delay/iterador) + " segundos")
     print("Média de diferença de sincronização: " + str(total_diferenca/iterador) + " segundos")
-    print("--------------------------------------------------")
+    print("-------------------------------------------------------------------------------")
     iterador += 1
     time.sleep(60*minutos) # Espera minutos para sincronizar novamente
