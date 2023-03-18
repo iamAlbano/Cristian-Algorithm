@@ -38,7 +38,7 @@ def client():
   print("Horário: " + str(hora_cliente))
 
   # calcula a diferença na sincronização
-  diferenca = hora_atual - hora_cliente
+  diferenca = abs(hora_atual - hora_cliente)
   print("Diferença de sincronização : "+ str(diferenca.total_seconds()) + " segundos")
   return delay, diferenca
   s.close()       
