@@ -8,16 +8,16 @@ import datetime
 from dateutil import parser
 from timeit import default_timer as timer
 
-def linux_set_time(datetime):
+def linux_set_time(timestamp):
   try: 
     import subprocess
     import shlex
 
-    time = (datetime.year, datetime.month, datetime.day, datetime.hour, datetime.minute, datetime.second, datetime.microsecond)
+    time = (timestamp.year, timestamp.month, timestamp.day, timestamp.hour, timestamp.minute, timestamp.second, timestamp.microsecond)
 
-    time_string = datetime(*time).isoformat()
+    time_string = datetime.datetime(*time).isoformat()
 
-    subprocess.call(shlex.split("timedatectl set-ntp false")) 
+    subprocess.call(shlex.split("sudo timedatectl set-ntp false")) 
     subprocess.call(shlex.split("sudo date -s '%s'" % time_string))
     subprocess.call(shlex.split("sudo hwclock -w"))
   except:
@@ -51,11 +51,11 @@ def client():
   print("Latência: " + str(delay) + " segundos")
 
   # hora do cliente é a hora do servidor + o delay 
-  hora_cliente = hora_ntp + datetime.timedelta(seconds = delay)
+  hora_cliente = hora_ntp + datetime.timedelta(seconds = delay/2)
 
-  # Atualiza horário do sistema operacional
-  if sys.platform == 'linux2' or sys.platform == 'linux':
-    linux_set_time(hora_cliente)
+  # Utilize o comando abaixo para atualizar horário do sistema operacional
+  # if sys.platform == 'linux2' or sys.platform == 'linux':
+  #   linux_set_time(hora_cliente)
 
   print("Horário: " + str(hora_cliente))
 
